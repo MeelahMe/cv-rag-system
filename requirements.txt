@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+httpx
+python-multipart
+weaviate-client  # or qdrant-client, depending on your DB
+python-dotenv
+pydantic
+pytest
+
