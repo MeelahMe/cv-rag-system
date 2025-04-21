@@ -1,24 +1,31 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: cv-rag-api
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
-    env_file:
-      - .env
+    environment:
+      - VECTOR_DB_HOST=http://cv-rag-vector-db:8080
     depends_on:
-      - weaviate
+      cv-rag-vector-db:
+        condition: service_healthy
 
-  weaviate:
+  cv-rag-vector-db:
     image: semitechnologies/weaviate:1.24.8
     container_name: cv-rag-vector-db
     ports:
       - "8080:8080"
+      - "50051:50051"
     environment:
-      QUERY_DEFAULTS_LIMIT: 25
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
-      DEFAULT_VECTORIZER_MODULE: "none"
-      ENABLE_MODULES: "none"
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - DEFAULT_VECTORIZER_MODULE=none
+      - CLUSTER_HOSTNAME=node1
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/v1/.well-known/ready || exit 1"]      
+      interval: 5s
+      timeout: 5s
+      retries: 30
