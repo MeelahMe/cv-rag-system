@@ -1,4 +1,3 @@
-cat << 'EOF' > README.md
 # Gemini-Powered CV RAG System
 
 This repository contains a multilingual Retrieval-Augmented Generation (RAG) system for processing, embedding, and semantically searching CVs in PDF format. It uses the Google Gemini API to extract structured text and generate semantic embeddings, and a vector database to enable fast, metadata-aware search.
@@ -18,8 +17,7 @@ The system is modular, containerized, and designed for local use or deployment o
 ---
 
 ## Project structure
-
-\`\`\`bash
+```bash
 cv-rag-system/
 ├── app/
 │   ├── main.py                # FastAPI application
@@ -41,7 +39,7 @@ cv-rag-system/
 ├── requirements.txt
 ├── .env.template
 ├── postman_collection.json
-\`\`\`
+```
 
 ---
 
@@ -55,31 +53,33 @@ cv-rag-system/
 
 ### 1. Clone the repository
 
-\`\`\`bash
+```bash
 git clone https://github.com/your-username/cv-rag-system.git
 cd cv-rag-system
-\`\`\`
+```
 
 ### 2. Set up a virtual environment
 
-\`\`\`bash
+```bash
 python -m venv venv
 source venv/bin/activate
-\`\`\`
+
+```
 
 ### 3. Install dependencies
 
-\`\`\`bash
+```bash
 pip install -r requirements.txt
-\`\`\`
+```
+
 
 ### 4. Configure environment variables
 
 Copy the template file and update it with your configuration:
 
-\`\`\`bash
+```bash
 cp .env.template .env
-\`\`\`
+```
 
 Set values such as your Gemini API key and vector database host.
 
@@ -89,9 +89,9 @@ Set values such as your Gemini API key and vector database host.
 
 Start the development server:
 
-\`\`\`bash
+```bash
 uvicorn app.main:app --reload
-\`\`\`
+```
 
 Once the server is running, visit \`http://localhost:8000/docs\` to access the interactive API documentation.
 
@@ -99,29 +99,31 @@ Once the server is running, visit \`http://localhost:8000/docs\` to access the i
 
 ## Endpoints
 
-### POST \`/parse\`
+### POST `/parse`
 
 Uploads a CV in PDF format, parses the content using the Gemini API, and returns the structured text and its embedding.
 
-### POST \`/search\`
+### POST `/search`
 
 Accepts a query and returns the top-matching CVs from the vector database based on semantic similarity.
 
-### POST \`/score\`
+### POST `/score`
 
 Accepts a job description and one or more CVs, returning a relevance score and an explanation of the match.
 
 ---
 
-## Testing the \`/parse\` endpoint
+## Testing the `/parse` endpoint
 
 1. Start the application:
-   \`\`\`bash
+   
+   ```bash
    uvicorn app.main:app --reload
-   \`\`\`
+   ```
+
 2. Navigate to:
-   \`http://localhost:8000/docs\`
-3. Select the \`POST /parse\` endpoint.
+   `http://localhost:8000/docs`
+3. Select the `POST /parse` endpoint.
 4. Upload a PDF file.
 5. Submit the request. The response includes the extracted text and a 768-dimensional vector.
 
@@ -129,19 +131,19 @@ Accepts a job description and one or more CVs, returning a relevance score and a
 
 ## Troubleshooting
 
-### Error: \`Form data requires "python-multipart" to be installed\`
+### Error: `Form data requires "python-multipart" to be installed`
 
 Install the required package:
 
-\`\`\`bash
+```bash
 pip install python-multipart
-\`\`\`
+```
 
-### Error: \`module 'app.api.search' has no attribute 'router'\`
+### Error: `module 'app.api.search' has no attribute 'router'`
 
-Ensure that \`search.py\` contains the following:
+Ensure that `search.py` contains the following:
 
-\`\`\`python
+```python
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -149,30 +151,30 @@ router = APIRouter()
 @router.post("/search")
 async def search():
     return {"message": "Coming soon"}
-\`\`\`
+```
 
-### Error: \`There is no tracking information for the current branch\`
+### Error: `There is no tracking information for the current branch`
 
 Set your local branch to track the remote:
 
-\`\`\`bash
+```bash
 git branch --set-upstream-to=origin/main main
-\`\`\`
+```
 
-### Error: \`Updates were rejected because the tip of your current branch is behind\`
+### Error: `Updates were rejected because the tip of your current branch is behind`
 
 Use rebase to integrate changes safely:
 
-\`\`\`bash
+```bash
 git pull origin main --rebase
 git push origin main
-\`\`\`
+```
 
 Alternatively, use force push to overwrite the remote:
 
-\`\`\`bash
+```bash
 git push origin main --force
-\`\`\`
+```
 
 ---
 
