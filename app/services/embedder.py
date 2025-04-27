@@ -1,10 +1,26 @@
-# app/services/embedder.py
+import os
+import google.generativeai as genai  
 
-def generate_embedding(text: str) -> list:
-    """
-    Stub function to simulate Gemini embedding generation.
-    Replace this with actual Gemini API call.
-    """
-    print("Generating embedding using Gemini (stub)...")
-    return [0.1] * 768  # Simulate a 768-dim embedding vector
+# Define your embedding model
+EMBEDDING_MODEL = "models/embedding-001"
+
+def generate_embedding(text: str):
+    """Generate an embedding for the given text using Google's Generative AI."""
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("Missing GEMINI_API_KEY or GOOGLE_API_KEY environment variable.")
+
+    # Configure the API key
+    genai.configure(api_key=api_key)
+
+    try:
+        # Generate the embedding
+        response = genai.embed_content(
+            model=EMBEDDING_MODEL,
+            content=text,
+            task_type="retrieval_document"
+        )
+        return response["embedding"]
+    except Exception as e:
+        raise RuntimeError(f"Failed to generate embedding: {e}")
 

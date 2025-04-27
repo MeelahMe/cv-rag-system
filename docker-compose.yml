@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   api:
     build:
@@ -6,6 +8,8 @@ services:
     container_name: cv-rag-api
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - VECTOR_DB_HOST=http://cv-rag-vector-db:8080
     depends_on:
@@ -25,7 +29,7 @@ services:
       - DEFAULT_VECTORIZER_MODULE=none
       - CLUSTER_HOSTNAME=node1
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/v1/.well-known/ready || exit 1"]      
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/v1/.well-known/ready || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 30
