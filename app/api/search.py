@@ -16,9 +16,14 @@ async def search(request: SearchRequest):
     and return top-matching CVs from the vector database.
     """
     try:
-        embedding = generate_embedding(request.query)
-        results = search_cvs(embedding, top_k=request.top_k)
+        # Step 1: Embed the query
+        embedding = await generate_embedding(request.query)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate embedding: {e}")
+
+    try:
+        # Step 2: Search Weaviate
+        results = await search_cvs(embedding, top_k=request.top_k)
         return {"results": results}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+        raise HTTPException(status_code=500, detail=f"Failed to search CVs: {e}")

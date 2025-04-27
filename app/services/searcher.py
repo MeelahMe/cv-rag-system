@@ -1,9 +1,8 @@
 import time
 import weaviate
 import os
-from requests.exceptions import ConnectionError
 
-VECTOR_DB_HOST = os.getenv("VECTOR_DB_HOST", "http://weaviate:8080")
+VECTOR_DB_HOST = os.getenv("VECTOR_DB_HOST", "http://cv-rag-vector-db:8080")
 
 def connect_to_weaviate(max_retries=20, wait_seconds=3):
     """
@@ -24,12 +23,12 @@ def connect_to_weaviate(max_retries=20, wait_seconds=3):
 
     raise RuntimeError("Could not connect to Weaviate after multiple retries.")
 
-client = connect_to_weaviate()
-
 def init_schema():
     """
     Initialize the schema for the CV class in Weaviate if it does not already exist.
     """
+    client = connect_to_weaviate()
+    
     class_obj = {
         "class": "CV",
         "description": "A parsed CV document",
@@ -53,6 +52,8 @@ def insert_cv(text, embedding, metadata):
     """
     Insert a CV object with its embedding and metadata into the Weaviate database.
     """
+    client = connect_to_weaviate()
+    
     client.data_object.create(
         data_object={**metadata, "text": text},
         class_name="CV",
@@ -63,11 +64,14 @@ def search_cvs(query_embedding, top_k=5):
     """
     Perform a vector search against stored CVs and return the top K results with metadata.
     """
-    response = client.query.get("CV", [
-        "text", "language", "skills", "job_title", "years_experience"
-    ]).with_near_vector({
-        "vector": query_embedding
-    }).with_limit(top_k).do()
+    client = connect_to_weaviate()
+
+    response = (
+        client.query
+        .get("CV", ["text", "language", "skills", "job_title", "years_experience"])
+        .with_near_vector({"vector": query_embedding})
+        .with_limit(top_k)
+        .do()
+    )
 
     return response.get("data", {}).get("Get", {}).get("CV", [])
-
