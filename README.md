@@ -191,7 +191,6 @@ git push origin main --force
 ## Author
 
 Jameelah Naadirah Mercer  
-Founder of [Jua Docs](https://www.juadocs.com)  
 [LinkedIn](https://www.linkedin.com/in/jameelahmercer)
 EOF
 
