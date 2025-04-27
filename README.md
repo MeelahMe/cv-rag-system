@@ -190,7 +190,7 @@ git push origin main --force
 
 ## Author
 
-Jameelah Naadirah Mercer  
+Jameelah Mercer  
 [LinkedIn](https://www.linkedin.com/in/jameelahmercer)
 EOF
 
