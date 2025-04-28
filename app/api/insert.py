@@ -3,6 +3,9 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from app.services.embedder import generate_embedding
 from app.services.searcher import insert_cv, insert_cvs_bulk
+from fastapi import Depends
+from app.services.auth import verify_api_key
+
 
 router = APIRouter()
 
@@ -17,7 +20,7 @@ class BulkInsertCVRequest(BaseModel):
     cvs: List[InsertCVRequest]
 
 @router.post("/insert-cv")
-async def insert_cv_endpoint(request: InsertCVRequest):
+async def insert_cv_endpoint(request: InsertCVRequest, api_key: str = Depends(verify_api_key)):
     """
     Insert a new CV into the vector database with its metadata and embedding.
     """
@@ -35,7 +38,7 @@ async def insert_cv_endpoint(request: InsertCVRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/bulk-insert-cv")
-async def bulk_insert_cvs(request: BulkInsertCVRequest):
+async def bulk_insert_cvs(request: BulkInsertCVRequest, api_key: str = Depends(verify_api_key)):
     """
     Bulk insert multiple CVs into the vector database.
     """

@@ -8,7 +8,6 @@ The system is modular, containerized, and designed for local or cloud deployment
 
 For a detailed system design of the Multilingual CV RAG system, including architecture diagrams, data flow, scalability considerations, and future improvements, see the [System Design Document](./docs/system_design_overview.md).
 
-
 ---
 
 ## Features
