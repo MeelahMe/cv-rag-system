@@ -44,12 +44,11 @@ cv-rag-system/
 
 ---
 
-## Setup
+## Setup instructions
 
 ### Prerequisites
 
 - Python 3.9+
-- pip
 - Docker (optional, for containerized deployment)
 
 ### 1. Clone the repository
@@ -64,7 +63,6 @@ cd cv-rag-system
 ```bash
 python -m venv venv
 source venv/bin/activate
-
 ```
 
 ### 3. Install dependencies
@@ -72,7 +70,6 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
-
 
 ### 4. Configure environment variables
 
@@ -88,10 +85,16 @@ Set values such as your Gemini API key and vector database host.
 
 ## Running the application
 
-Start the development server:
+To run locally, start the development server:
 
 ```bash
 uvicorn app.main:app --reload
+```
+
+To runfully conntainerized (FastAPI + Weaviate):
+
+```bash
+docker-compose up --build
 ```
 
 Once the server is running, visit \`http://localhost:8000/docs\` to access the interactive API documentation.
