@@ -1,44 +1,45 @@
-# Gemini-Powered CV RAG System
+# Gemini-Powered CV Retrieval System
 
-This repository contains a multilingual Retrieval-Augmented Generation (RAG) system for processing, embedding, and semantically searching CVs in PDF format. It uses the Google Gemini API to extract structured text and generate semantic embeddings, and a vector database to enable fast, metadata-aware search.
+A multilingual, vector-based retrieval system for semantically searching CVs using Google's Gemini API.  
+This project combines FastAPI, Docker, and Weaviate to create a scalable backend for parsing, embedding, storing, and scoring CV documents.
 
-The system is modular, containerized, and designed for local use or deployment on Google Cloud Platform (GCP).
+The system is modular, containerized, and designed for local or cloud deployment.
 
 ---
 
 ## Features
 
-- Parse CV PDFs in Arabic and English using the Gemini API.
-- Generate 768-dimensional semantic embeddings.
-- Store and query embeddings using a vector database.
-- Expose three REST endpoints: \`/parse\`, \`/search\`, and \`/score\`.
-- Deploy locally using Docker or to GCP using Cloud Run or GKE.
+- Parse and embed CVs in English, Arabic, and Spanish using the Gemini API
+- Store embeddings with metadata in a Weaviate vector database
+- Perform semantic search with optional metadata filtering
+- Score job descriptions against CVs to assess relevance
+- Modular architecture with clear separation of API routes, services, and utilities
+- Local development using Docker Compose
 
 ---
 
-## Project structure
+## Project Structure
+
 ```bash
 cv-rag-system/
 ├── app/
-│   ├── main.py                # FastAPI application
-│   ├── api/                   # Route definitions
+│   ├── api/                   # API route definitions
+│   │   ├── insert.py
 │   │   ├── parse.py
-│   │   ├── search.py
-│   │   └── score.py
-│   ├── services/              # Core logic
-│   │   ├── parser.py
+│   │   ├── score.py
+│   │   └── search.py
+│   ├── services/              # Core service logic
 │   │   ├── embedder.py
+│   │   ├── parser.py
 │   │   ├── scorer.py
 │   │   └── searcher.py
-│   └── utils/
-│       └── helpers.py
-├── tests/
-│   └── test_parse.py
+│   └── main.py                # FastAPI application setup
+├── bulk_insert.sh             # Bulk insert sample CVs
+├── test_features.sh           # End-to-end testing script
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-├── .env.template
-├── postman_collection.json
+└── .env.template              # Environment variable template
 ```
 
 ---
