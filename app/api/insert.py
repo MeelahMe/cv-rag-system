@@ -34,8 +34,8 @@ async def insert_cv_endpoint(request: InsertCVRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/insert-cvs")
-async def bulk_insert_cv_endpoint(request: BulkInsertCVRequest):
+@router.post("/bulk-insert-cv")
+async def bulk_insert_cvs(request: BulkInsertCVRequest):
     """
     Bulk insert multiple CVs into the vector database.
     """
@@ -44,4 +44,3 @@ async def bulk_insert_cv_endpoint(request: BulkInsertCVRequest):
         return {"message": f"{len(request.cvs)} CVs inserted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

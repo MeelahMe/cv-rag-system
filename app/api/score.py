@@ -1,22 +1,29 @@
-# app/api/score.py
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.services import scorer, searcher
+from app.services.embedder import generate_embedding
 
 router = APIRouter()
 
 class ScoreRequest(BaseModel):
+    query: str
     text: str
 
 @router.post("/score")
-def score_cv(request: ScoreRequest):
+async def score_text(request: ScoreRequest):
     """
-    Embed the CV text and perform a similarity search against indexed CVs.
+    Generate embeddings for both query and text, then return a nicely rounded similarity score.
     """
     try:
-        embedding = scorer.embed(request.text)
-        results = searcher.search_cvs(query_embedding=embedding)
-        return {"results": results}
+        query_embedding = generate_embedding(request.query)
+        text_embedding = generate_embedding(request.text)
+
+        # Simple similarity calculation
+        similarity = sum(q * t for q, t in zip(query_embedding, text_embedding))
+
+        # Round the result to 4 decimal places
+        similarity = round(similarity, 4)
+
+        return {"Similarity score": similarity}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to embed text: {e}")
+

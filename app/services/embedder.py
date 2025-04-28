@@ -1,5 +1,5 @@
 import os
-import google.generativeai as genai  
+import google.generativeai as genai
 
 # Define your embedding model
 EMBEDDING_MODEL = "models/embedding-001"
@@ -14,13 +14,12 @@ def generate_embedding(text: str):
     genai.configure(api_key=api_key)
 
     try:
-        # Generate the embedding
+        # Correct payload for your library version
         response = genai.embed_content(
             model=EMBEDDING_MODEL,
-            content=text,
+            content=text,  # <- Corrected here
             task_type="retrieval_document"
         )
         return response["embedding"]
     except Exception as e:
         raise RuntimeError(f"Failed to generate embedding: {e}")
-
