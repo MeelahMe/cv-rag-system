@@ -101,19 +101,15 @@ Once the server is running, visit \`http://localhost:8000/docs\` to access the i
 
 ---
 
-## Endpoints
+## Available API Endpoints
 
-### POST `/parse`
-
-Uploads a CV in PDF format, parses the content using the Gemini API, and returns the structured text and its embedding.
-
-### POST `/search`
-
-Accepts a query and returns the top-matching CVs from the vector database based on semantic similarity.
-
-### POST `/score`
-
-Accepts a job description and one or more CVs, returning a relevance score and an explanation of the match.
+| Method | Endpoint | Description |
+|:------|:---------|:------------|
+| POST | `/insert-cv` | Insert a single parsed CV |
+| POST | `/bulk-insert-cv` | Insert multiple CVs at once |
+| POST | `/parse/parse` | Parse and embed a CV text input |
+| POST | `/search/search` | Semantic search against stored CVs |
+| POST | `/score/score` | Score a job description against a CV |
 
 ---
 
