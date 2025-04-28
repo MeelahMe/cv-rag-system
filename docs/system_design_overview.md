@@ -106,6 +106,4 @@ Each major function is isolated into its own service to ensure separation of con
 
 ## Conclusion
 
-This system is designed to be practical, modular, and extensible — demonstrating real-world backend architecture, DSA principles applied in service design (e.g., nearest neighbor search), multilingual ML integration, and production-readiness. 
-
-It balances clean engineering with a focus on deployment, security, and user-centric features — reflecting professional standards expected at FAANG and top-tier companies.
+This system is designed to be practical, modular, and extensible — demonstrating real-world backend architecture, DSA principles applied in service design (e.g., nearest neighbor search), multilingual ML integration, and production-readiness. It balances clean engineering with a focus on deployment, security, and user-centric features.
