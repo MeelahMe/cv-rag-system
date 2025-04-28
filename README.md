@@ -1,7 +1,6 @@
 # Gemini-Powered CV Retrieval System
 
-A multilingual, vector-based retrieval system for semantically searching CVs using Google's Gemini API.  
-This project combines FastAPI, Docker, and Weaviate to create a scalable backend for parsing, embedding, storing, and scoring CV documents.
+A multilingual, vector-based retrieval system for semantically searching CVs using Google's Gemini API. This project combines FastAPI, Docker, and Weaviate to create a scalable backend for parsing, embedding, storing, and scoring CV documents.
 
 The system is modular, containerized, and designed for local or cloud deployment.
 
@@ -105,11 +104,12 @@ Once the server is running, visit \`http://localhost:8000/docs\` to access the i
 
 | Method | Endpoint | Description |
 |:------|:---------|:------------|
-| POST | `/insert-cv` | Insert a single parsed CV |
-| POST | `/bulk-insert-cv` | Insert multiple CVs at once |
-| POST | `/parse/parse` | Parse and embed a CV text input |
-| POST | `/search/search` | Semantic search against stored CVs |
-| POST | `/score/score` | Score a job description against a CV |
+| POST | `/insert-cv` | **[Insert]** Insert a single parsed CV |
+| POST | `/bulk-insert-cv` | **[Insert]** Insert multiple CVs at once |
+| POST | `/parse/parse` | **[Parse]** Parse and embed a CV text input |
+| POST | `/search/search` | **[Search]** Perform semantic search against stored CVs |
+| POST | `/score/score` | **[Score]** Score a job description against a stored CV |
+
 
 ---
 
