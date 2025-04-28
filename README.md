@@ -113,19 +113,24 @@ Once the server is running, visit \`http://localhost:8000/docs\` to access the i
 
 ---
 
-## Testing the `/parse` endpoint
+## Testing the system
 
-1. Start the application:
-   
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+ Start the application run:
 
-2. Navigate to:
-   `http://localhost:8000/docs`
-3. Select the `POST /parse` endpoint.
-4. Upload a PDF file.
-5. Submit the request. The response includes the extracted text and a 768-dimensional vector.
+```bash
+docker-compose down -v
+docker-compose up --build
+```
+
+In a second terminal run end-to-end tests:
+
+```bash
+./test_features.sh
+```
+
+```bash
+./bulk_insert.sh
+```
 
 ---
 
@@ -153,38 +158,16 @@ async def search():
     return {"message": "Coming soon"}
 ```
 
-### Error: `There is no tracking information for the current branch`
-
-Set your local branch to track the remote:
-
-```bash
-git branch --set-upstream-to=origin/main main
-```
-
-### Error: `Updates were rejected because the tip of your current branch is behind`
-
-Use rebase to integrate changes safely:
-
-```bash
-git pull origin main --rebase
-git push origin main
-```
-
-Alternatively, use force push to overwrite the remote:
-
-```bash
-git push origin main --force
-```
-
 ---
 
-## Upcoming features
+## Future Improvements
 
-- Gemini API integration for production
-- Embedding storage using Weaviate or Qdrant
-- Scoring logic and explanation framework
-- Batch processing for large datasets
-- GCP deployment and public demo endpoint
+- Seed database with synthetic CVs using Faker
+- API key authentication for protected endpoints
+- Bulk ingestion optimization (async batch inserts)
+- Postman Collection export for easier testing and API documentation
+- Optional frontend interface for CV search and scoring
+- Enhanced scoring explanation (natural language output)
 
 ---
 
@@ -192,5 +175,4 @@ git push origin main --force
 
 Jameelah Mercer  
 [LinkedIn](https://www.linkedin.com/in/jameelahmercer)
-EOF
 
