@@ -167,7 +167,6 @@ async def search():
 ## Future Improvements
 
 - Seed database with synthetic CVs using Faker
-- API key authentication for protected endpoints
 - Bulk ingestion optimization (async batch inserts)
 - Postman Collection export for easier testing and API documentation
 - Optional frontend interface for CV search and scoring
