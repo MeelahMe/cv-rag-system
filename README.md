@@ -8,6 +8,12 @@ The system is modular, containerized, and designed for local or cloud deployment
 
 For a detailed system design of the Multilingual CV RAG system, including architecture diagrams, data flow, scalability considerations, and future improvements, see the [System Design Document](./docs/system_design_overview.md).
 
+## Postman Collection
+
+You can test the full API using the provided Postman Collection:
+
+- [Download CV RAG System API Postman Collection](./cv-rag-system.postman_collection.json)
+
 ---
 
 ## Features
@@ -168,7 +174,6 @@ async def search():
 
 - Seed database with synthetic CVs using Faker
 - Bulk ingestion optimization (async batch inserts)
-- Postman Collection export for easier testing and API documentation
 - Frontend interface for CV search and scoring
 - Enhanced scoring explanation (natural language output)
 
