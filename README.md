@@ -169,7 +169,7 @@ async def search():
 - Seed database with synthetic CVs using Faker
 - Bulk ingestion optimization (async batch inserts)
 - Postman Collection export for easier testing and API documentation
-- Optional frontend interface for CV search and scoring
+- Frontend interface for CV search and scoring
 - Enhanced scoring explanation (natural language output)
 
 ---
