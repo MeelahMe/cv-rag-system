@@ -8,11 +8,14 @@ The system is modular, containerized, and designed for local or cloud deployment
 
 For a detailed system design of the Multilingual CV RAG system, including architecture diagrams, data flow, scalability considerations, and future improvements, see the [System Design Document](./docs/system_design_overview.md).
 
-## Postman Collection
+## API documentation
 
 You can test the full API using the provided Postman Collection:
 
-- [Download CV RAG System API Postman Collection](./cv-rag-system.postman_collection.json)
+- [Download CV RAG System API Postman Collection](./CV%20RAG%20System%20API.postman_collection.json)
+
+
+Use the `cv-rag-system-local` Postman environment with your `base_url` and `api_key` variables configured.
 
 ---
 
