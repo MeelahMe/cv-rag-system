@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "📝 Inserting a CV..."
+echo " Inserting a CV..."
 curl -X POST http://localhost:8000/insert/insert \
   -H "Content-Type: application/json" \
   -d '{
@@ -25,7 +25,7 @@ echo ""
 echo " Basic Search Done"
 echo ""
 
-echo "🎯 Filtered Search..."
+echo " Filtered Search..."
 curl -X POST http://localhost:8000/search/search \
   -H "Content-Type: application/json" \
   -d '{
@@ -40,7 +40,7 @@ echo ""
 echo " Filtered Search Done"
 echo ""
 
-echo "📈 Scoring Query against CV..."
+echo " Scoring Query against CV..."
 curl -X POST http://localhost:8000/score/score \
   -H "Content-Type: application/json" \
   -d '{
@@ -51,5 +51,5 @@ echo ""
 echo " Scoring Done"
 echo ""
 
-echo "🏁 All tests finished."
+echo " All tests finished."
 
