@@ -27,6 +27,7 @@ Use the `cv-rag-system-local` Postman environment with your `base_url` and `api_
 - Score job descriptions against CVs to assess relevance
 - Modular architecture with clear separation of API routes, services, and utilities
 - Local development using Docker Compose
+- Seed database with realistic fake CVs for testing and demonstrations
 
 ---
 
@@ -45,6 +46,8 @@ cv-rag-system/
 │   │   ├── parser.py
 │   │   ├── scorer.py
 │   │   └── searcher.py
+│   ├── scripts/               # Development scripts (e.g., seeding)
+│   │   └── seed.py
 │   └── main.py                # FastAPI application setup
 ├── bulk_insert.sh             # Bulk insert sample CVs
 ├── test_features.sh           # End-to-end testing script
@@ -103,7 +106,7 @@ To run locally, start the development server:
 uvicorn app.main:app --reload
 ```
 
-To runfully conntainerized (FastAPI + Weaviate):
+To run fully conntainerized (FastAPI + Weaviate):
 
 ```bash
 docker-compose up --build
@@ -126,24 +129,46 @@ Once the server is running, visit \`http://localhost:8000/docs\` to access the i
 
 ---
 
-## Testing the system
+## Seeding the database with Fake CVs
 
- Start the application run:
+This project includes a Faker-powered seeding script to generate realistic CV data for testing and demo purposes.
+
+### Run the seeding script
+
+Ensure your API server is running, then execute:
+
+```bash
+python app/scripts/seed.py
+```
+The script will insert multiple realistic CVs into the database automatically via the API.
+
+You can configure the number of CVs seeded by editing `num_cvs` inside `seed.py`.
+
+## Local development workflow
+
+## Full local testing
+
+1. Start the API and vector database:
 
 ```bash
 docker-compose down -v
 docker-compose up --build
 ```
 
-In a second terminal run end-to-end tests:
+2. In a second terminal, run end-to-end tests:
 
 ```bash
 ./test_features.sh
 ```
+3. Seed sample data:
 
 ```bash
 ./bulk_insert.sh
+python app/scripts/seed.py
 ```
+4. Explore API functionality via Postman or browser:
+
+Visit `http://localhost:8000/docs`
 
 ---
 
@@ -157,28 +182,22 @@ Install the required package:
 pip install python-multipart
 ```
 
-### Error: `module 'app.api.search' has no attribute 'router'`
+### Error: `Connection Refused`
 
-Ensure that `search.py` contains the following:
+Ensure that the FastAPI server is running and accessible at` http://localhost:8000`.
 
-```python
-from fastapi import APIRouter
+### Error: `Invalid or missing API key`
 
-router = APIRouter()
-
-@router.post("/search")
-async def search():
-    return {"message": "Coming soon"}
-```
+Verify that the `x-api-key` header is set correctly in your Postman requests.
 
 ---
 
 ## Future Improvements
 
-- Seed database with synthetic CVs using Faker
 - Bulk ingestion optimization (async batch inserts)
 - Frontend interface for CV search and scoring
 - Enhanced scoring explanation (natural language output)
+- Public deployment on GCP Cloud Run
 
 ---
 
