@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "6d1f27a7-9e38-4e43-836b-571c3cea7b1e",
+		"name": "CV RAG System API (local)",
+		"description": "This collection provides API requests for interacting with the CV Retrieval-Augmented Generation (RAG) system. It allows for inserting parsed CVs, bulk inserting multiple CVs, searching stored CVs based on semantic similarity, and scoring CVs against a job description.\n\nEnvironment Variables:\n\n- `base_url`: Base URL of the API (e.g., [http://localhost:8000](http://localhost:8000))\n    \n- `api_key`: API key for authenticated routes (`/insert-cv`, `/bulk-insert-cv`)\n    \n\nUse the provided sample payloads to test inserting, searching, and scoring CVs within the vector database.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44292628",
+		"_collection_link": "https://jameelahmercer-2950655.postman.co/workspace/75c38a91-1b7b-456b-8770-62cabeeaee1b/collection/44292628-6d1f27a7-9e38-4e43-836b-571c3cea7b1e?action=share&source=collection_link&creator=44292628"
+	},
+	"item": [
+		{
+			"name": "Insert Single CV",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "-api-key",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"text\": \"John Doe is a senior data scientist specializing in Python and TensorFlow.\",\n  \"language\": \"English\",\n  \"skills\": [\"Python\", \"TensorFlow\"],\n  \"job_title\": \"Senior Data Scientist\",\n  \"years_experience\": 6\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/insert-cv\n",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"insert-cv\n"
+					]
+				},
+				"description": "Use this endpoint to insert a single parsed CV into the vector database.  \nThe request requires an API key provided via the `x-api-key` header.  \nSubmit the full CV text along with metadata including language, skills, job title, and years of experience. A semantic embedding will be generated and stored automatically."
+			},
+			"response": []
+		},
+		{
+			"name": "Bulk Insert CVs",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"cvs\": [\n    {\n      \"text\": \"Jane Smith is a software engineer with expertise in React and Node.js.\",\n      \"language\": \"English\",\n      \"skills\": [\"React\", \"Node.js\"],\n      \"job_title\": \"Software Engineer\",\n      \"years_experience\": 4\n    },\n    {\n      \"text\": \"Carlos Ruiz is a backend developer with deep experience in Go and Kubernetes.\",\n      \"language\": \"Spanish\",\n      \"skills\": [\"Go\", \"Kubernetes\"],\n      \"job_title\": \"Backend Developer\",\n      \"years_experience\": 7\n    }\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/bulk-insert-cv\n",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bulk-insert-cv\n"
+					]
+				},
+				"description": "Use this endpoint to insert multiple parsed CVs in a single request.  \nThe request requires an API key provided via the `x-api-key` header.  \nProvide an array of CV objects, each containing text, language, skills, job title, and years of experience. Embeddings will be generated for each CV and stored efficiently in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Search CVs",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"backend developer with Kubernetes experience\",\n  \"top_k\": 5\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/search/search\n",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"search",
+						"search\n"
+					]
+				},
+				"description": "Use this endpoint to perform a semantic search across stored CVs.  \nSubmit a natural language query, and the system will return the top-k most relevant CVs based on vector similarity. No authentication is required for this endpoint."
+			},
+			"response": []
+		},
+		{
+			"name": "Score CV",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"Looking for a senior backend engineer with Go and Kubernetes experience.\",\n  \"text\": \"Carlos Ruiz is a backend developer with deep experience in Go and Kubernetes.\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/score/score\n",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"score",
+						"score\n"
+					]
+				},
+				"description": "Use this endpoint to compare a job description or query text against a specific CV.  \nThe system will generate embeddings for both inputs and return a similarity score, indicating how closely the CV matches the provided description. No authentication is required for this endpoint."
+			},
+			"response": []
+		}
+	]
+}
