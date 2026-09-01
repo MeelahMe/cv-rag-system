@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo " Inserting a CV..."
-curl -X POST http://localhost:8000/insert/insert \
+curl -X POST http://localhost:8000/insert-cv \
   -H "Content-Type: application/json" \
   -d '{
     "text": "John Doe is a senior data scientist with 5 years of experience in machine learning and Python.",

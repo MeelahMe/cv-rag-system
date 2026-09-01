@@ -1,10 +1,14 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
+from app.services.auth import verify_api_key
 from app.services.embedder import generate_embedding
 from app.services.searcher import search_cvs
 
 router = APIRouter()
+
 
 class SearchRequest(BaseModel):
     query: str
@@ -14,15 +18,16 @@ class SearchRequest(BaseModel):
     skills: Optional[List[str]] = None
     job_title: Optional[str] = None
 
+
 @router.post("/search")
-async def search(request: SearchRequest):
+async def search(request: SearchRequest, api_key: str = Depends(verify_api_key)):
     """
     Accept a natural language query, convert it to an embedding,
     and return top-matching CVs from the vector database with optional filters.
     """
     try:
         # Step 1: Embed the query
-       embedding = generate_embedding(request.query)
+        embedding = generate_embedding(request.query)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate embedding: {e}")
 

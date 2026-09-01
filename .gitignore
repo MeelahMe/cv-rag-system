@@ -1,7 +1,10 @@
 __pycache__/
 *.pyc
 .env
-.env.*
+.env.local
+.env.production
+# NOTE: intentionally not using a .env.* wildcard here - it was
+# silently ignoring .env.template, which needs to be committed.
 venv/
 *.log
 .postman

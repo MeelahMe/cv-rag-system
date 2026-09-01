@@ -1,29 +1,48 @@
-from fastapi import APIRouter, HTTPException
+import math
+
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+
+from app.services.auth import verify_api_key
 from app.services.embedder import generate_embedding
 
 router = APIRouter()
+
 
 class ScoreRequest(BaseModel):
     query: str
     text: str
 
-@router.post("/score")
-async def score_text(request: ScoreRequest):
+
+def cosine_similarity(a: list[float], b: list[float]) -> float:
     """
-    Generate embeddings for both query and text, then return a nicely rounded similarity score.
+    Proper cosine similarity, bounded to [-1, 1]. The previous
+    implementation was a raw, unnormalized dot product, which is
+    sensitive to vector magnitude, not just directional alignment -
+    not a valid similarity metric on its own.
+    """
+    dot = sum(x * y for x, y in zip(a, b))
+    norm_a = math.sqrt(sum(x * x for x in a))
+    norm_b = math.sqrt(sum(y * y for y in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
+@router.post("/score")
+async def score_text(request: ScoreRequest, api_key: str = Depends(verify_api_key)):
+    """
+    Generate embeddings for both query and text, then return a proper
+    cosine similarity score, consistent with the scoring used in
+    app/services/searcher.py's search results.
     """
     try:
         query_embedding = generate_embedding(request.query)
         text_embedding = generate_embedding(request.text)
 
-        # Simple similarity calculation
-        similarity = sum(q * t for q, t in zip(query_embedding, text_embedding))
+        similarity = round(cosine_similarity(query_embedding, text_embedding), 4)
 
-        # Round the result to 4 decimal places
-        similarity = round(similarity, 4)
-
-        return {"Similarity score": similarity}
+        return {"similarity_score": similarity}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to embed text: {e}")
 
