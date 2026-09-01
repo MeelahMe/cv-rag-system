@@ -1,21 +1,24 @@
 # Gemini-Powered CV Retrieval System
 
-A multilingual, vector-based retrieval system for semantically searching CVs using Google's Gemini API. This project combines FastAPI, Docker, and Weaviate to create a scalable backend for parsing, embedding, storing, and scoring CV documents.
+A multilingual, vector-based retrieval system for semantically searching CVs using Google's Gemini API. It combines FastAPI, Docker, and Weaviate to parse, embed, store, and score CV documents.
 
-The system is modular, containerized, and designed for local or cloud deployment.
+The system is modular and containerized, and it's meant to run locally or in the cloud.
 
-##  System Design Overview
+## Current status
 
-For a detailed system design of the Multilingual CV RAG system, including architecture diagrams, data flow, scalability considerations, and future improvements, see the [System Design Document](./docs/system_design_overview.md).
+The core parse, insert, search, and score flow works and is authenticated. There is no automated test suite yet: the only testing right now is the manual shell scripts described below. Adding real pytest coverage is next on the list. See [Roadmap](#roadmap).
+
+## System design overview
+
+For architecture diagrams, data flow, scalability considerations, and future improvements, see the [system design document](./docs/system_design_overview.md).
 
 ## API documentation
 
-You can test the full API using the provided Postman Collection:
+You can test the full API using the included Postman collection:
 
-- [Download CV RAG System API Postman Collection](./CV%20RAG%20System%20API.postman_collection.json)
+- [Download the CV RAG System API Postman collection](./CV%20RAG%20System%20API.postman_collection.json)
 
-
-Use the `cv-rag-system-local` Postman environment with your `base_url` and `api_key` variables configured.
+Use the `cv-rag-system-local` Postman environment, and set your own `base_url` and `api_key` variables.
 
 ---
 
@@ -24,14 +27,15 @@ Use the `cv-rag-system-local` Postman environment with your `base_url` and `api_
 - Parse and embed CVs in English, Arabic, and Spanish using the Gemini API
 - Store embeddings with metadata in a Weaviate vector database
 - Perform semantic search with optional metadata filtering
-- Score job descriptions against CVs to assess relevance
-- Modular architecture with clear separation of API routes, services, and utilities
-- Local development using Docker Compose
-- Seed database with realistic fake CVs for testing and demonstrations
+- Score a query against a CV using proper cosine similarity
+- API key authentication required on every endpoint
+- Modular architecture with clear separation between API routes and services
+- Local development with Docker Compose
+- Seed the database with realistic fake CVs for testing and demos
 
 ---
 
-## Project Structure
+## Project structure
 
 ```bash
 cv-rag-system/
@@ -42,19 +46,21 @@ cv-rag-system/
 │   │   ├── score.py
 │   │   └── search.py
 │   ├── services/              # Core service logic
+│   │   ├── auth.py            # API key verification
 │   │   ├── embedder.py
 │   │   ├── parser.py
-│   │   ├── scorer.py
 │   │   └── searcher.py
-│   ├── scripts/               # Development scripts (e.g., seeding)
+│   ├── scripts/               # Development scripts (e.g. seeding)
 │   │   └── seed.py
 │   └── main.py                # FastAPI application setup
+├── docs/
+│   └── system_design_overview.md
 ├── bulk_insert.sh             # Bulk insert sample CVs
-├── test_features.sh           # End-to-end testing script
+├── test_features.sh           # End-to-end manual test script
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-└── .env.template              # Environment variable template
+└── .env.template               # Environment variable template
 ```
 
 ---
@@ -69,7 +75,7 @@ cv-rag-system/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/cv-rag-system.git
+git clone https://github.com/MeelahMe/cv-rag-system.git
 cd cv-rag-system
 ```
 
@@ -88,65 +94,63 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-Copy the template file and update it with your configuration:
+Copy the template file and fill in your own values:
 
 ```bash
 cp .env.template .env
 ```
 
-Set values such as your Gemini API key and vector database host.
+You'll need a real Gemini API key and a value for `API_KEY`. `API_KEY` isn't a Google key. It's a secret you make up yourself, and every request to this API needs to send it back in an `X-API-Key` header.
 
 ---
 
 ## Running the application
 
-To run locally, start the development server:
+To run locally:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-To run fully conntainerized (FastAPI + Weaviate):
+To run fully containerized (FastAPI and Weaviate together):
 
 ```bash
 docker-compose up --build
 ```
 
-Once the server is running, visit \`http://localhost:8000/docs\` to access the interactive API documentation.
+Once it's running, visit `http://localhost:8000/docs` for the interactive API documentation.
 
 ---
 
-## Available API Endpoints
+## Available API endpoints
+
+All endpoints require an `X-API-Key` header matching your configured `API_KEY`.
 
 | Method | Endpoint | Description |
 |:------|:---------|:------------|
-| POST | `/insert-cv` | **[Insert]** Insert a single parsed CV |
-| POST | `/bulk-insert-cv` | **[Insert]** Insert multiple CVs at once |
-| POST | `/parse/parse` | **[Parse]** Parse and embed a CV text input |
-| POST | `/search/search` | **[Search]** Perform semantic search against stored CVs |
-| POST | `/score/score` | **[Score]** Score a job description against a stored CV |
-
+| POST | `/insert-cv` | Insert a single parsed CV |
+| POST | `/bulk-insert-cv` | Insert multiple CVs at once |
+| POST | `/parse/parse` | Parse a CV file and embed it |
+| POST | `/search/search` | Semantic search against stored CVs |
+| POST | `/score/score` | Score a query against a CV using cosine similarity |
 
 ---
 
-## Seeding the database with Fake CVs
+## Seeding the database with fake CVs
 
-This project includes a Faker-powered seeding script to generate realistic CV data for testing and demo purposes.
+This project includes a Faker-powered seeding script that generates realistic CV data for testing and demos.
 
-### Run the seeding script
-
-Ensure your API server is running, then execute:
+Make sure your API server is running, then:
 
 ```bash
 python app/scripts/seed.py
 ```
-The script will insert multiple realistic CVs into the database automatically via the API.
 
-You can configure the number of CVs seeded by editing `num_cvs` inside `seed.py`.
+The script inserts multiple realistic CVs into the database through the API. You can change how many get seeded by editing `num_cvs` in `seed.py`.
 
 ## Local development workflow
 
-## Full local testing
+### Full local testing
 
 1. Start the API and vector database:
 
@@ -155,20 +159,20 @@ docker-compose down -v
 docker-compose up --build
 ```
 
-2. In a second terminal, run end-to-end tests:
+2. In a second terminal, run the end-to-end test script:
 
 ```bash
 ./test_features.sh
 ```
+
 3. Seed sample data:
 
 ```bash
 ./bulk_insert.sh
 python app/scripts/seed.py
 ```
-4. Explore API functionality via Postman or browser:
 
-Visit `http://localhost:8000/docs`
+4. Explore the API through Postman or your browser at `http://localhost:8000/docs`.
 
 ---
 
@@ -176,33 +180,34 @@ Visit `http://localhost:8000/docs`
 
 ### Error: `Form data requires "python-multipart" to be installed`
 
-Install the required package:
-
 ```bash
 pip install python-multipart
 ```
 
 ### Error: `Connection Refused`
 
-Ensure that the FastAPI server is running and accessible at` http://localhost:8000`.
+Make sure the FastAPI server is running and reachable at `http://localhost:8000`.
 
 ### Error: `Invalid or missing API key`
 
-Verify that the `x-api-key` header is set correctly in your Postman requests.
+Every endpoint requires the `X-API-Key` header now, not just the insert routes. Check that it's set and matches your `API_KEY` value in `.env`.
 
 ---
 
-## Future Improvements
+## Roadmap
 
-- Bulk ingestion optimization (async batch inserts)
-- Frontend interface for CV search and scoring
-- Enhanced scoring explanation (natural language output)
-- Public deployment on GCP Cloud Run
+- [ ] Real pytest coverage. `tests/` currently exists but is empty; the only testing today is the manual shell scripts above
+- [ ] Fix `searcher.py`'s Weaviate connection so it doesn't block at import time, which will make writing tests much easier
+- [ ] CI pipeline: tests, gitleaks, Semgrep, Bandit, Trivy, same setup used on the other projects in this portfolio
+- [ ] Test the RAG pipeline for prompt injection and retrieval or scoring poisoning through CV content, and document the findings
+- [ ] Bulk ingestion optimization (async batch inserts)
+- [ ] Frontend interface for CV search and scoring
+- [ ] Enhanced scoring explanation (natural language output)
+- [ ] Public deployment on GCP Cloud Run
 
 ---
 
 ## Author
 
-Jameelah Mercer  
+Jameelah Mercer
 [LinkedIn](https://www.linkedin.com/in/jameelahmercer)
-
