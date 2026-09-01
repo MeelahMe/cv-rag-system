@@ -1,29 +1,49 @@
-import time
-import weaviate
 import os
+import time
+
+import weaviate
 from requests.exceptions import ConnectionError
+
 from app.services.embedder import generate_embedding
 
 VECTOR_DB_HOST = os.getenv("VECTOR_DB_HOST", "http://weaviate:8080")
 
+_client = None
+
+
 def connect_to_weaviate(max_retries=20, wait_seconds=3):
     for attempt in range(max_retries):
         try:
-            client = weaviate.Client(
+            candidate = weaviate.Client(
                 url=VECTOR_DB_HOST,
-                additional_headers={"Content-Type": "application/json"}
+                additional_headers={"Content-Type": "application/json"},
             )
-            if client.is_ready():
+            if candidate.is_ready():
                 print("Connected to Weaviate.")
-                return client
+                return candidate
         except Exception:
-            print(f"Attempt {attempt + 1}: Weaviate not ready. Retrying in {wait_seconds} seconds...")
+            print(
+                f"Attempt {attempt + 1}: Weaviate not ready. "
+                f"Retrying in {wait_seconds} seconds..."
+            )
             time.sleep(wait_seconds)
     raise RuntimeError("Could not connect to Weaviate after multiple retries.")
 
-client = connect_to_weaviate()
+
+def get_client():
+    """
+    Lazily connect to Weaviate on first real use, not at import time.
+    Importing this module (e.g. from a test file that mocks this
+    function) no longer triggers a blocking connection attempt.
+    """
+    global _client
+    if _client is None:
+        _client = connect_to_weaviate()
+    return _client
+
 
 def init_schema():
+    client = get_client()
     class_obj = {
         "class": "CV",
         "description": "A parsed CV document",
@@ -33,8 +53,8 @@ def init_schema():
             {"name": "language", "dataType": ["string"]},
             {"name": "skills", "dataType": ["string[]"]},
             {"name": "job_title", "dataType": ["string"]},
-            {"name": "years_experience", "dataType": ["number"]}
-        ]
+            {"name": "years_experience", "dataType": ["number"]},
+        ],
     }
     if not client.schema.contains({"class": "CV"}):
         client.schema.create_class(class_obj)
@@ -42,14 +62,18 @@ def init_schema():
     else:
         print("CV class already exists.")
 
+
 def insert_cv(text, embedding, metadata):
+    client = get_client()
     client.data_object.create(
         data_object={**metadata, "text": text},
         class_name="CV",
-        vector=embedding
+        vector=embedding,
     )
 
+
 def insert_cvs_bulk(cvs):
+    client = get_client()
     objects = []
     for cv in cvs:
         embedding = generate_embedding(cv.text)
@@ -57,36 +81,45 @@ def insert_cvs_bulk(cvs):
             "language": cv.language,
             "skills": cv.skills,
             "job_title": cv.job_title,
-            "years_experience": cv.years_experience
+            "years_experience": cv.years_experience,
         }
-        objects.append({
-            "class": "CV",
-            "properties": {**metadata, "text": cv.text},
-            "vector": embedding
-        })
+        objects.append(
+            {
+                "class": "CV",
+                "properties": {**metadata, "text": cv.text},
+                "vector": embedding,
+            }
+        )
     with client.batch as batch:
         batch.batch_size = 20
         for obj in objects:
             batch.add_data_object(
                 obj["properties"],
                 obj["class"],
-                vector=obj["vector"]
+                vector=obj["vector"],
             )
+
 
 def search_cvs(query_embedding, top_k=5, filters=None):
     """
     Perform a vector search against stored CVs, with optional metadata filtering.
     """
-    query = client.query.get("CV", [
-        "text",
-        "language",
-        "skills",
-        "job_title",
-        "years_experience",
-        "_additional { distance }"
-    ]).with_near_vector({
-        "vector": query_embedding
-    }).with_limit(top_k)
+    client = get_client()
+    query = (
+        client.query.get(
+            "CV",
+            [
+                "text",
+                "language",
+                "skills",
+                "job_title",
+                "years_experience",
+                "_additional { distance }",
+            ],
+        )
+        .with_near_vector({"vector": query_embedding})
+        .with_limit(top_k)
+    )
 
     if filters:
         where_clause = build_where_filter(filters)
@@ -107,50 +140,56 @@ def search_cvs(query_embedding, top_k=5, filters=None):
             "skills": item.get("skills"),
             "job_title": item.get("job_title"),
             "years_experience": item.get("years_experience"),
-            "score": similarity_score
+            "score": similarity_score,
         }
         results.append(result)
 
     return results
 
+
 def build_where_filter(filters):
     """
-    Build a Weaviate 'where' filter from a dictionary of filter conditions.
+    Build a Weaviate \'where\' filter from a dictionary of filter conditions.
     """
     clauses = []
 
     if "language" in filters:
-        clauses.append({
-            "path": ["language"],
-            "operator": "Equal",
-            "valueString": filters["language"]
-        })
+        clauses.append(
+            {
+                "path": ["language"],
+                "operator": "Equal",
+                "valueString": filters["language"],
+            }
+        )
 
     if "min_years_experience" in filters:
-        clauses.append({
-            "path": ["years_experience"],
-            "operator": "GreaterThanEqual",
-            "valueNumber": filters["min_years_experience"]
-        })
+        clauses.append(
+            {
+                "path": ["years_experience"],
+                "operator": "GreaterThanEqual",
+                "valueNumber": filters["min_years_experience"],
+            }
+        )
 
     if "skills" in filters:
-        clauses.append({
-            "path": ["skills"],
-            "operator": "ContainsAny",
-            "valueTextArray": filters["skills"]
-        })
+        clauses.append(
+            {
+                "path": ["skills"],
+                "operator": "ContainsAny",
+                "valueTextArray": filters["skills"],
+            }
+        )
 
     if "job_title" in filters:
-        clauses.append({
-            "path": ["job_title"],
-            "operator": "Equal",
-            "valueString": filters["job_title"]
-        })
+        clauses.append(
+            {
+                "path": ["job_title"],
+                "operator": "Equal",
+                "valueString": filters["job_title"],
+            }
+        )
 
     if not clauses:
         return None
 
-    return {
-        "operator": "And",
-        "operands": clauses
-    }
+    return {"operator": "And", "operands": clauses}
