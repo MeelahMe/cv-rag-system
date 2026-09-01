@@ -6,7 +6,7 @@ The system is modular and containerized, and it's meant to run locally or in the
 
 ## Current status
 
-The core parse, insert, search, and score flow works and is authenticated. There is no automated test suite yet: the only testing right now is the manual shell scripts described below. Adding real pytest coverage is next on the list. See [Roadmap](#roadmap).
+The core parse, insert, search, and score flow works, is authenticated, and has been verified end to end against the real Gemini and Weaviate stack. There is no automated test suite yet: the only testing right now is the manual shell scripts described below. Adding real pytest coverage is next on the list. See [Roadmap](#roadmap).
 
 ## System design overview
 
@@ -196,8 +196,14 @@ Every endpoint requires the `X-API-Key` header now, not just the insert routes. 
 
 ## Roadmap
 
+- [x] Auth enforced on every endpoint, not just insert
+- [x] Fixed `/score`'s similarity calculation (was a raw, unnormalized dot product, now proper cosine similarity)
+- [x] Removed dead code (`scorer.py`, an unused parallel embedding implementation, and an empty `utils/helpers.py`)
+- [x] Migrated off the deprecated `google.generativeai` SDK and the shut-down `embedding-001` model to the current `google-genai` SDK and `gemini-embedding-001`
+- [x] Fixed `searcher.py`'s Weaviate connection so it no longer blocks at import time
+- [x] Pinned `requirements.txt` to actual working versions, removed the unused `openai` dependency
+- [x] Fixed `.gitignore` silently excluding `.env.template`, and fixed `test_features.sh` calling a URL that never existed
 - [ ] Real pytest coverage. `tests/` currently exists but is empty; the only testing today is the manual shell scripts above
-- [ ] Fix `searcher.py`'s Weaviate connection so it doesn't block at import time, which will make writing tests much easier
 - [ ] CI pipeline: tests, gitleaks, Semgrep, Bandit, Trivy, same setup used on the other projects in this portfolio
 - [ ] Test the RAG pipeline for prompt injection and retrieval or scoring poisoning through CV content, and document the findings
 - [ ] Bulk ingestion optimization (async batch inserts)
