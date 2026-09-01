@@ -1,7 +1,12 @@
 #!/bin/bash
+# Load API_KEY from .env so every request below can authenticate
+set -a
+source .env
+set +a
 
 echo " Inserting a CV..."
 curl -X POST http://localhost:8000/insert-cv \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "John Doe is a senior data scientist with 5 years of experience in machine learning and Python.",
@@ -16,6 +21,7 @@ echo ""
 
 echo "🔍 Basic Search..."
 curl -X POST http://localhost:8000/search/search \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "machine learning",
@@ -27,6 +33,7 @@ echo ""
 
 echo " Filtered Search..."
 curl -X POST http://localhost:8000/search/search \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "data scientist",
@@ -42,6 +49,7 @@ echo ""
 
 echo " Scoring Query against CV..."
 curl -X POST http://localhost:8000/score/score \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "machine learning expert",

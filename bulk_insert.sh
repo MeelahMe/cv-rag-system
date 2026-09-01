@@ -1,8 +1,13 @@
 #!/bin/bash
+# Load API_KEY from .env so every request below can authenticate
+set -a
+source .env
+set +a
 
 echo "Inserting sample CVs..."
 
 curl -X POST http://localhost:8000/insert-cv \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "John Doe is a senior data scientist with 5 years of experience in machine learning and Python.",
@@ -14,6 +19,7 @@ curl -X POST http://localhost:8000/insert-cv \
 echo ""
 
 curl -X POST http://localhost:8000/insert-cv \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Jane Smith is a junior software developer with 1 year of experience in JavaScript and React.",
@@ -25,6 +31,7 @@ curl -X POST http://localhost:8000/insert-cv \
 echo ""
 
 curl -X POST http://localhost:8000/insert-cv \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Carlos Ruiz is a senior backend engineer with 8 years of experience in Go and Kubernetes.",
@@ -36,6 +43,7 @@ curl -X POST http://localhost:8000/insert-cv \
 echo ""
 
 curl -X POST http://localhost:8000/insert-cv \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Aisha Khan is a data analyst with 3 years of experience in SQL and Tableau.",
@@ -47,6 +55,7 @@ curl -X POST http://localhost:8000/insert-cv \
 echo ""
 
 curl -X POST http://localhost:8000/insert-cv \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Mohammed Al-Fulan is a machine learning engineer with 6 years of experience in Python and TensorFlow.",
