@@ -29,6 +29,10 @@ def extract_metadata(text: str) -> dict:
     return {
         "language": "en",  # You can later use a library to auto-detect this
         "skills": list(set(skill.capitalize() for skill in skills)),
-        "job_title": job_title_match.group(0) if job_title_match else "Unknown",
+        # .title() normalizes casing to match the pattern's canonical form
+        # (e.g. "software engineer" -> "Software Engineer"). Without this,
+        # search.py's exact-match job_title filter would silently miss CVs
+        # whose source text used different capitalization.
+        "job_title": job_title_match.group(0).title() if job_title_match else "Unknown",
         "years_experience": int(experience_match.group(1)) if experience_match else 0
     }
