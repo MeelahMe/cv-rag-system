@@ -7,7 +7,9 @@ router = APIRouter()
 
 
 @router.post("/parse")
-async def parse_cv(file: UploadFile = File(...), api_key: str = Depends(verify_api_key)):
+async def parse_cv(
+    file: UploadFile = File(...), api_key: str = Depends(verify_api_key)
+):
     """
     Parse a CV file, embed it, extract metadata, and store it.
     Mirrors the error-handling pattern used in insert.py, search.py,

@@ -29,7 +29,9 @@ async def search(request: SearchRequest, api_key: str = Depends(verify_api_key))
         # Step 1: Embed the query
         embedding = generate_embedding(request.query)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate embedding: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate embedding: {e}"
+        )
 
     # Step 2: Build filters if provided
     filters = {}

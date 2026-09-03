@@ -2,7 +2,6 @@ import os
 import time
 
 import weaviate
-from requests.exceptions import ConnectionError
 
 from app.services.embedder import generate_embedding
 

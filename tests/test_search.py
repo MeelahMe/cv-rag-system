@@ -14,7 +14,9 @@ def test_search_basic_success(client, auth_headers):
     ]
 
     with patch("app.api.search.generate_embedding", return_value=[0.1, 0.2, 0.3]):
-        with patch("app.api.search.search_cvs", return_value=fake_results) as mock_search:
+        with patch(
+            "app.api.search.search_cvs", return_value=fake_results
+        ) as mock_search:
             response = client.post(
                 "/search/search",
                 json={"query": "machine learning", "top_k": 5},
@@ -58,7 +60,9 @@ def test_search_missing_required_field(client, auth_headers):
 
 
 def test_search_embedding_failure_returns_500(client, auth_headers):
-    with patch("app.api.search.generate_embedding", side_effect=RuntimeError("Gemini down")):
+    with patch(
+        "app.api.search.generate_embedding", side_effect=RuntimeError("Gemini down")
+    ):
         response = client.post(
             "/search/search", json={"query": "python"}, headers=auth_headers
         )
@@ -69,7 +73,9 @@ def test_search_embedding_failure_returns_500(client, auth_headers):
 
 def test_search_backend_failure_returns_500(client, auth_headers):
     with patch("app.api.search.generate_embedding", return_value=[0.1, 0.2, 0.3]):
-        with patch("app.api.search.search_cvs", side_effect=RuntimeError("Weaviate down")):
+        with patch(
+            "app.api.search.search_cvs", side_effect=RuntimeError("Weaviate down")
+        ):
             response = client.post(
                 "/search/search", json={"query": "python"}, headers=auth_headers
             )

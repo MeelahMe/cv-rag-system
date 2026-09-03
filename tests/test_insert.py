@@ -11,9 +11,13 @@ VALID_PAYLOAD = {
 
 
 def test_insert_cv_success(client, auth_headers):
-    with patch("app.api.insert.generate_embedding", return_value=[0.1, 0.2, 0.3]) as mock_embed:
+    with patch(
+        "app.api.insert.generate_embedding", return_value=[0.1, 0.2, 0.3]
+    ) as mock_embed:
         with patch("app.api.insert.insert_cv", return_value=None) as mock_insert:
-            response = client.post("/insert-cv", json=VALID_PAYLOAD, headers=auth_headers)
+            response = client.post(
+                "/insert-cv", json=VALID_PAYLOAD, headers=auth_headers
+            )
 
     assert response.status_code == 200
     assert response.json() == {"message": "CV inserted successfully"}
@@ -28,7 +32,9 @@ def test_insert_cv_missing_required_field(client, auth_headers):
 
 
 def test_insert_cv_embedding_failure_returns_500(client, auth_headers):
-    with patch("app.api.insert.generate_embedding", side_effect=RuntimeError("Gemini down")):
+    with patch(
+        "app.api.insert.generate_embedding", side_effect=RuntimeError("Gemini down")
+    ):
         response = client.post("/insert-cv", json=VALID_PAYLOAD, headers=auth_headers)
 
     assert response.status_code == 500
@@ -47,7 +53,9 @@ def test_bulk_insert_cv_success(client, auth_headers):
 
 def test_bulk_insert_cv_failure_returns_500(client, auth_headers):
     payload = {"cvs": [VALID_PAYLOAD]}
-    with patch("app.api.insert.insert_cvs_bulk", side_effect=RuntimeError("Weaviate down")):
+    with patch(
+        "app.api.insert.insert_cvs_bulk", side_effect=RuntimeError("Weaviate down")
+    ):
         response = client.post("/bulk-insert-cv", json=payload, headers=auth_headers)
 
     assert response.status_code == 500

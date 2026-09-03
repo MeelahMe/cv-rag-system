@@ -2,9 +2,10 @@ from unittest.mock import patch
 
 
 def test_insert_cv_missing_key_returns_401(client):
-    response = client.post("/insert-cv", json={
-        "text": "Test", "language": "English", "job_title": "Engineer"
-    })
+    response = client.post(
+        "/insert-cv",
+        json={"text": "Test", "language": "English", "job_title": "Engineer"},
+    )
     assert response.status_code == 401
 
 
@@ -31,7 +32,8 @@ def test_score_missing_key_returns_401(client):
 
 def test_parse_missing_key_returns_401(client):
     response = client.post(
-        "/parse/parse", files={"file": ("test.pdf", b"%PDF-1.4 fake", "application/pdf")}
+        "/parse/parse",
+        files={"file": ("test.pdf", b"%PDF-1.4 fake", "application/pdf")},
     )
     assert response.status_code == 401
 

@@ -45,4 +45,3 @@ async def score_text(request: ScoreRequest, api_key: str = Depends(verify_api_ke
         return {"similarity_score": similarity}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to embed text: {e}")
-
