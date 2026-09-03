@@ -66,7 +66,9 @@ def generate_fake_cv():
 
 def insert_cv(cv):
     headers = {"Content-Type": "application/json", "x-api-key": API_KEY}
-    response = requests.post(f"{API_URL}/insert-cv", json=cv, headers=headers)
+    response = requests.post(
+        f"{API_URL}/insert-cv", json=cv, headers=headers, timeout=10
+    )
     if response.status_code == 200:
         print(f"Inserted CV ({cv['language']}): {cv['text'][:30]}...")
     else:
