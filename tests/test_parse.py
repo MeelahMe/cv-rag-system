@@ -56,6 +56,22 @@ def test_parse_rejects_non_pdf_with_clean_error(client, auth_headers):
     assert "Only PDF files are supported" in response.json()["detail"]
 
 
+def test_parse_rejects_malformed_pdf_with_clean_error(client, auth_headers):
+    """
+    A file named .pdf but with genuinely corrupted content raises
+    PdfReadError from PyPDF2, not ValueError - this specifically
+    guards against that exception type slipping past error handling
+    the way it did before this fix (found via manual testing against
+    the live stack, not caught by mocked unit tests alone).
+    """
+    response = client.post(
+        "/parse/parse",
+        files={"file": ("cv.pdf", b"not a real pdf, just text", "application/pdf")},
+        headers=auth_headers,
+    )
+    assert response.status_code == 400
+
+
 def test_parse_embedding_failure_returns_clean_500(client, auth_headers):
     with patch("app.api.parse.parser.parse_content", return_value="Some CV text"):
         with patch(

@@ -5,6 +5,7 @@ from app.services.embedder import generate_embedding
 from app.services.searcher import insert_cv, insert_cvs_bulk
 from fastapi import Depends
 from app.services.auth import verify_api_key
+from app.services.text_quality import compute_topical_coherence
 
 
 router = APIRouter()
@@ -40,7 +41,20 @@ async def insert_cv_endpoint(
             "years_experience": request.years_experience,
         }
         insert_cv(request.text, embedding, metadata)
-        return {"message": "CV inserted successfully"}
+
+        # Topical coherence check: catches buzzword-stuffed text that
+        # lexical diversity can't (near-zero literal word repetition,
+        # but sentences unrelated to each other in meaning). This is
+        # advisory only right now - flagged, not blocked - since the
+        # threshold hasn't been validated against enough real CVs yet
+        # to risk rejecting genuine multi-skill candidates.
+        coherence = compute_topical_coherence(request.text, generate_embedding)
+
+        return {
+            "message": "CV inserted successfully",
+            "coherence_score": round(coherence, 4),
+            "flagged_low_coherence": coherence < 0.5,
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

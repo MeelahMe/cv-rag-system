@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from PyPDF2.errors import PdfReadError
 
 from app.services import embedder, parser, searcher
 from app.services.auth import verify_api_key
@@ -20,7 +21,7 @@ async def parse_cv(
     try:
         content = await file.read()
         text = parser.parse_content(content, file.filename)
-    except ValueError as e:
+    except (ValueError, PdfReadError) as e:
         raise HTTPException(status_code=400, detail=str(e))
 
     try:

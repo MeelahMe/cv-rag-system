@@ -57,7 +57,33 @@ def test_score_success(client, auth_headers):
         )
 
     assert response.status_code == 200
-    assert response.json() == {"similarity_score": 1.0}
+    data = response.json()
+    assert data["similarity_score"] == 1.0
+    assert data["flagged_low_diversity"] is False
+
+
+def test_score_flags_and_penalizes_repetitive_text(client, auth_headers):
+    with patch(
+        "app.api.score.generate_embedding",
+        side_effect=[[1.0, 0.0], [1.0, 0.0]],
+    ):
+        response = client.post(
+            "/score/score",
+            json={
+                "query": "python",
+                "text": "python python python python python python "
+                "python python python python python python python "
+                "python python python",
+            },
+            headers=auth_headers,
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["flagged_low_diversity"] is True
+    # Identical embeddings give a raw cosine similarity of 1.0; the
+    # stuffing penalty should have cut that in half.
+    assert data["similarity_score"] == 0.5
 
 
 def test_score_missing_required_field(client, auth_headers):

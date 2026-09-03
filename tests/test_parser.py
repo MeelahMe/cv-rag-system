@@ -40,3 +40,23 @@ def test_parse_content_rejects_non_pdf_filename():
 
     with pytest.raises(ValueError, match="Only PDF files are supported"):
         parse_content(b"irrelevant content", "resume.docx")
+
+
+def test_extract_metadata_ignores_negated_skills():
+    text = (
+        "I am not a Python developer. I have never worked as a Data "
+        "Scientist and have no experience with Machine Learning."
+    )
+    result = extract_metadata(text)
+
+    assert result["skills"] == []
+    assert result["job_title"] == "Unknown"
+
+
+def test_extract_metadata_still_matches_genuine_mentions():
+    text = "I am a Python developer with strong SQL skills, currently a Data Scientist."
+    result = extract_metadata(text)
+
+    assert "Python" in result["skills"]
+    assert "Sql" in result["skills"]
+    assert result["job_title"] == "Data Scientist"
